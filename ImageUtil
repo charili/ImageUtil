@@ -1,0 +1,108 @@
+ /**
+     * 切割字符串
+     */
+    private static void getListText(String text, List<String> ls) {
+        String[] splitedTexts = text.split("\n");
+        for (String sp : splitedTexts) {
+            ls.add(sp);
+        }
+    }
+    
+    private static void drawString(Graphics2D g, Font font, String text1, int x, int y, int yn,
+            int showLine) {
+        FontMetrics fg = g.getFontMetrics(font);
+        List<String> ls = new ArrayList<>();
+        getListText(text1, ls);
+        g.setFont(font);
+        for (int i = 0; i < ls.size(); i++) {
+            if (i == showLine) {
+                break;
+            }
+            int[] arr = getWidthAndHeight(ls.get(i), font);
+            int width = arr[0];
+            int positionX = (WIDTH_SUFFIX - width) / 2;
+            if (i == 0) {
+                g.drawString(ls.get(i), positionX, y);
+            } else {
+                g.drawString(ls.get(i), positionX, y + i * yn);
+            }
+        }
+//        int height = fg.getHeight();
+//        if (ls.size() <= showLine) {
+//            y = y + height * ls.size();
+//        } else {
+//            y = y + height * showLine;
+//        }
+//        return y;
+    }
+
+    private static SplitedTextInf getSplitedText(String str, int length, int maxLength) {
+        SplitedTextInf splitedTextInf = new SplitedTextInf();
+        int count = 1;
+        StringBuilder newStr = new StringBuilder();
+        if (str.length() > length) {
+            for (int i = 0; i < str.length(); i++) {
+                if (count > maxLength) {
+                    break;
+                }
+                newStr.append(str.charAt(i));
+                if ((i + 1) % length == 0 && i != str.length() - 1) {
+                    newStr.append("\n");
+                    count++;
+                }
+            }
+        } else {
+            newStr.append(str);
+        }
+        splitedTextInf.setNumber(count);
+        splitedTextInf.setSplitedText(newStr.toString());
+        return splitedTextInf;
+    }
+
+    public static byte[] createImage(WritingTypeEnum writingTypeEnum, String str, Font font) throws Exception {
+        log.info("create image str:{}", str);
+        int length = 0;
+        int maxLength = 0;
+        if (writingTypeEnum == WritingTypeEnum.AI_PUBLICITY_TITLE) {
+            length = COPY_WRITING_LINE_WORD_NUMBER;
+            maxLength = 100;
+
+        } else {
+            length = SUB_TITLE_TEXT_LINE_WORD_NUMBER;
+            maxLength = 5;
+        }
+        SplitedTextInf splitedTextInf = getSplitedText(str, length, maxLength);
+        int[] arr = getWidthAndHeight(str, font);
+        int showLine = splitedTextInf.getNumber();
+
+        int width = WIDTH_SUFFIX;
+        int height = arr[1] * showLine + KEEP_LINE_HEIGHT * showLine;
+        BufferedImage image = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_BGR);
+        Graphics2D g2 = image.createGraphics();
+        // 增加下面代码使得背景透明
+        image = g2.getDeviceConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+        g2.dispose();
+        g2 = image.createGraphics();
+
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        g2.setFont(font);
+        if (writingTypeEnum == WritingTypeEnum.AI_PUBLICITY_TITLE) {
+            drawString(g2, font, splitedTextInf.getSplitedText(), TX, TY, YN1, showLine);
+        } else {
+            drawString(g2, font, splitedTextInf.getSplitedText(), STX, TY, YN, showLine);
+        }
+        g2.setStroke(new BasicStroke(3));
+        g2.dispose();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        ImageIO.write(image, "png", baos);
+        baos.flush();
+        //使用toByteArray()方法转换成字节数组
+        byte[] imageInByte = baos.toByteArray();
+        baos.close();
+        return imageInByte;
+    }
