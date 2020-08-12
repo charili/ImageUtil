@@ -1,0 +1,42 @@
+public class DrawTextLayoutParams {
+    private int widthLimit;
+    private int heightLimit;
+    private int lineLimit;
+    private boolean ignoreUndisplayablePart;
+    private int overlayMargin;
+    private int lineGap;
+
+    public DrawTextLayoutParams(int widthLimit, int heightLimit, int lineLimit, boolean ignoreUndisplayablePart,
+                          int overlayMargin, int lineGap) {
+        this.widthLimit = widthLimit;
+        this.heightLimit = heightLimit;
+        this.lineLimit = lineLimit;
+        this.ignoreUndisplayablePart = ignoreUndisplayablePart;
+        this.overlayMargin = overlayMargin;
+        this.lineGap = lineGap;
+    }
+
+    public int getWidthLimit() {
+        return widthLimit;
+    }
+
+    public int getHeightLimit() {
+        return heightLimit;
+    }
+
+    public int getLineLimit() {
+        return lineLimit;
+    }
+
+    public boolean isIgnoreUndisplayablePart() {
+        return ignoreUndisplayablePart;
+    }
+
+    public int getOverlayMargin() {
+        return overlayMargin;
+    }
+
+    public int getLineGap() {
+        return lineGap;
+    }
+}
